@@ -1,0 +1,30 @@
+### Get all courses
+GET http://localhost:8080/courses
+
+### Get one course by id
+GET http://localhost:8080/courses/2
+
+### Create a new course
+POST http://localhost:8080/courses
+Content-Type: application/json
+
+{
+  "id": 4,
+  "code": "CSCI 3120",
+  "name": "Operating Systems",
+  "instructor": "TBD"
+}
+
+### Update an existing course
+PUT http://localhost:8080/courses/4
+Content-Type: application/json
+
+{
+  "id": 4,
+  "code": "CSCI 3120",
+  "name": "Operating Systems",
+  "instructor": "Smith"
+}
+
+### Delete a course
+DELETE http://localhost:8080/courses/4
