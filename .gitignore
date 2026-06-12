@@ -31,3 +31,11 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Local secrets and env ###
+.env
+application-local.properties
+
+### IntelliJ run configs that may hold env vars ###
+.idea/workspace.xml
+.idea/runConfigurations/
