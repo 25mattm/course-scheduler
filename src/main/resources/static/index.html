@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Course Scheduler</title>
     <style>
-        body { font-family: system-ui, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; }
+        body { font-family: system-ui, sans-serif; max-width: 760px; margin: 40px auto; padding: 0 20px; }
         h1 { color: #E8197A; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid #ddd; }
@@ -13,6 +13,10 @@
         input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
         button { padding: 8px 16px; background: #E8197A; color: white; border: none; border-radius: 4px; cursor: pointer; }
         button:hover { background: #c4156a; }
+        .row-btn { padding: 4px 10px; font-size: 0.85em; margin-right: 4px; }
+        .delete-btn { background: #888; }
+        .delete-btn:hover { background: #666; }
+        .edit-input { padding: 4px; width: 90%; }
     </style>
 </head>
 <body>
@@ -20,7 +24,7 @@
 
 <table id="courseTable">
     <thead>
-    <tr><th>Code</th><th>Name</th><th>Instructor</th></tr>
+    <tr><th>Code</th><th>Name</th><th>Instructor</th><th></th></tr>
     </thead>
     <tbody id="courseBody"></tbody>
 </table>
@@ -33,7 +37,7 @@
 </form>
 
 <script>
-    // Fetch all courses and fill the table
+    // Fetch all courses and fill the table (display mode)
     async function loadCourses() {
         const response = await fetch('/courses');
         const courses = await response.json();
@@ -41,9 +45,53 @@
         body.innerHTML = '';
         courses.forEach(course => {
             const row = document.createElement('tr');
-            row.innerHTML = `<td>${course.code}</td><td>${course.name}</td><td>${course.instructor}</td>`;
+            row.id = `row-${course.id}`;
+            row.innerHTML = `
+                    <td>${course.code}</td>
+                    <td>${course.name}</td>
+                    <td>${course.instructor}</td>
+                    <td>
+                        <button class="row-btn" onclick="editCourse(${course.id}, '${course.code}', '${course.name}', '${course.instructor}')">Edit</button>
+                        <button class="row-btn delete-btn" onclick="deleteCourse(${course.id})">Delete</button>
+                    </td>
+                `;
             body.appendChild(row);
         });
+    }
+
+    // Switch a row into edit mode (cells become inputs)
+    function editCourse(id, code, name, instructor) {
+        const row = document.getElementById(`row-${id}`);
+        row.innerHTML = `
+                <td><input class="edit-input" id="edit-code-${id}" value="${code}"></td>
+                <td><input class="edit-input" id="edit-name-${id}" value="${name}"></td>
+                <td><input class="edit-input" id="edit-instructor-${id}" value="${instructor}"></td>
+                <td>
+                    <button class="row-btn" onclick="saveCourse(${id})">Save</button>
+                    <button class="row-btn delete-btn" onclick="loadCourses()">Cancel</button>
+                </td>
+            `;
+    }
+
+    // Read the inputs, send a PUT, then refresh
+    async function saveCourse(id) {
+        const updatedCourse = {
+            code: document.getElementById(`edit-code-${id}`).value,
+            name: document.getElementById(`edit-name-${id}`).value,
+            instructor: document.getElementById(`edit-instructor-${id}`).value
+        };
+        await fetch(`/courses/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedCourse)
+        });
+        loadCourses();
+    }
+
+    // Delete a course by id, then refresh
+    async function deleteCourse(id) {
+        await fetch(`/courses/${id}`, { method: 'DELETE' });
+        loadCourses();
     }
 
     // Handle the add-course form
@@ -60,10 +108,9 @@
             body: JSON.stringify(newCourse)
         });
         document.getElementById('addForm').reset();
-        loadCourses(); // refresh the table
+        loadCourses();
     });
 
-    // Load courses when the page opens
     loadCourses();
 </script>
 </body>
