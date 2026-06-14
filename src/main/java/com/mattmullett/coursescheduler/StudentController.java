@@ -66,4 +66,17 @@ public class StudentController {
         studentRepository.save(student);
         return ResponseEntity.ok(student);
     }
+
+    // UNENROLL a student from a course
+    @DeleteMapping("/students/{studentId}/enroll/{courseId}")
+    public ResponseEntity<Student> unenroll(@PathVariable int studentId, @PathVariable int courseId) {
+        Student student = studentRepository.findById(studentId).orElse(null);
+        if (student == null) {
+            return ResponseEntity.notFound().build();
+        }
+        // Remove the course from the student's set by matching id
+        student.getCourses().removeIf(course -> course.getId() == courseId);
+        studentRepository.save(student);
+        return ResponseEntity.ok(student);
+    }
 }

@@ -10,10 +10,12 @@ import java.util.List;
 public class CourseController {
 
     private final CourseRepository courseRepository;
+    private final StudentRepository studentRepository;
 
-    // Spring injects the repository automatically
-    public CourseController(CourseRepository courseRepository) {
+    // Spring injects both repositories automatically
+    public CourseController(CourseRepository courseRepository, StudentRepository studentRepository) {
         this.courseRepository = courseRepository;
+        this.studentRepository = studentRepository;
     }
 
     // GET all courses
@@ -57,5 +59,18 @@ public class CourseController {
             return ResponseEntity.ok("Deleted course with id " + id);
         }
         return ResponseEntity.notFound().build();
+    }
+
+    // GET the roster — students enrolled in a course
+    @GetMapping("/courses/{id}/students")
+    public ResponseEntity<List<Student>> getRoster(@PathVariable int id) {
+        if (!courseRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        List<Student> roster = studentRepository.findAll().stream()
+                .filter(student -> student.getCourses().stream()
+                        .anyMatch(course -> course.getId() == id))
+                .toList();
+        return ResponseEntity.ok(roster);
     }
 }

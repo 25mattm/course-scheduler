@@ -45,3 +45,6 @@ POST http://localhost:8080/students/1/enroll/1
 
 ### Get all students (see the enrollment)
 GET http://localhost:8080/students
+
+### Get roster for course 1
+GET http://localhost:8080/courses/1/students
