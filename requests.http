@@ -27,3 +27,21 @@ Content-Type: application/json
 
 ### Delete a course
 DELETE http://localhost:8080/courses/4
+
+### Get all students
+GET http://localhost:8080/students
+
+### Create a student
+POST http://localhost:8080/students
+Content-Type: application/json
+
+{
+  "name": "Jordan Lee",
+  "email": "jordan@dal.ca"
+}
+
+### Enroll student 1 in course 1
+POST http://localhost:8080/students/1/enroll/1
+
+### Get all students (see the enrollment)
+GET http://localhost:8080/students
